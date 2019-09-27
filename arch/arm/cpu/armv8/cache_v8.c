@@ -41,6 +41,15 @@ u64 get_tcr(int el, u64 *pips, u64 *pva_bits)
 	u64 tcr;
 	int i;
 
+	/* nasty hack */
+	struct mm_region *mem_map;
+	if (get_rpi_hw_ref() == 0x11) {
+		mem_map = mem_map_a;
+	} else {
+		mem_map = mem_map_b;
+	}
+
+
 	/* Find the largest address we need to support */
 	for (i = 0; mem_map[i].size || mem_map[i].attrs; i++)
 		max_addr = max(max_addr, mem_map[i].virt + mem_map[i].size);
@@ -274,6 +283,14 @@ static int count_required_pts(u64 addr, int level, u64 maxaddr)
 	int i;
 	enum pte_type pte_type = PTE_INVAL;
 
+	/* nasty hack */
+	struct mm_region *mem_map;
+	if (get_rpi_hw_ref() == 0x11) {
+		mem_map = mem_map_a;
+	} else {
+		mem_map = mem_map_b;
+	}
+
 	for (i = 0; mem_map[i].size || mem_map[i].attrs; i++) {
 		struct mm_region *map = &mem_map[i];
 		u64 start = map->virt;
@@ -373,6 +390,14 @@ void setup_pgtables(void)
 	 * Lv0 page table, otherwise it's the entry Lv1 page table.
 	 */
 	create_table();
+
+	/* nasty hack */
+	struct mm_region *mem_map;
+	if (get_rpi_hw_ref() == 0x11) {
+		mem_map = mem_map_a;
+	} else {
+		mem_map = mem_map_b;
+	}
 
 	/* Now add all MMU table entries one after another to the table */
 	for (i = 0; mem_map[i].size || mem_map[i].attrs; i++)

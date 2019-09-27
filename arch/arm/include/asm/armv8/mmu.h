@@ -131,7 +131,11 @@ struct mm_region {
 	u64 attrs;
 };
 
-extern struct mm_region *mem_map;
+/* support both raspberry pi memory layouts and pick one at runtime */
+extern struct mm_region *mem_map_a;
+extern struct mm_region *mem_map_b;
+uint32_t get_rpi_hw_ref(void);
+
 void setup_pgtables(void);
 u64 get_tcr(int el, u64 *pips, u64 *pva_bits);
 #endif

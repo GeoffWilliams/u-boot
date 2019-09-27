@@ -245,12 +245,12 @@ static const struct rpi_model rpi_models_old_scheme[] = {
 
 static uint32_t revision;
 static uint32_t rev_scheme;
-static uint32_t rev_type;
+static uint32_t rev_type;// = 0x11;
 static const struct rpi_model *model;
 
 #ifdef CONFIG_ARM64
-#ifndef CONFIG_BCM2711
-static struct mm_region bcm283x_mem_map[] = {
+//#ifndef CONFIG_BCM2711
+static struct mm_region other_bcm283x_mem_map[] = {
 	{
 		.virt = 0x00000000UL,
 		.phys = 0x00000000UL,
@@ -269,8 +269,8 @@ static struct mm_region bcm283x_mem_map[] = {
 		0,
 	}
 };
-#else
-static struct mm_region bcm283x_mem_map[] = {
+//#else
+static struct mm_region bcm2711_bcm283x_mem_map[] = {
 	{
 		.virt = 0x00000000UL,
 		.phys = 0x00000000UL,
@@ -289,9 +289,11 @@ static struct mm_region bcm283x_mem_map[] = {
 		0,
 	}
 };
+//#endif
+struct mm_region *mem_map_b = other_bcm283x_mem_map;
+struct mm_region *mem_map_a = bcm2711_bcm283x_mem_map;
 #endif
-struct mm_region *mem_map = bcm283x_mem_map;
-#endif
+
 
 int dram_init(void)
 {
@@ -521,4 +523,10 @@ int ft_board_setup(void *blob, bd_t *bd)
 #endif
 
 	return 0;
+}
+
+uint32_t get_rpi_hw_ref(void) {
+		// if we're really lucky this might setup rev_type for us
+		// crashes? get_board_rev();
+	 	return rev_type;
 }
